@@ -35,3 +35,4 @@ const Lector = () => {
 };
 
 export default Lector;
+
