@@ -22,7 +22,11 @@ const Navbar = () => {
 
 const NavbarLink = ({ href, label, icon, ...props }) => {
 	return (
-		<NavLink to={href} {...props}>
+		<NavLink
+			to={href}
+			{...props}
+			className={({ isActive }) => (isActive ? "activo" : "")}
+		>
 			<i className={`ti ti-${icon}`}></i>
 			<span>{label}</span>
 		</NavLink>
