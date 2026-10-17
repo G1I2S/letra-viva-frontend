@@ -24,7 +24,7 @@ const NavbarLink = ({ href, label, icon, ...props }) => {
 	return (
 		<NavLink to={href} {...props}>
 			<i className={`ti ti-${icon}`}></i>
-			{label}
+			<span>{label}</span>
 		</NavLink>
 	);
 };

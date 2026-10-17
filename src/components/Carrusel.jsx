@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Carrusel = ({ items }) => {
 	const itemsRef = useRef([]);
