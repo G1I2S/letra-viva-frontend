@@ -25,10 +25,16 @@ const Carrusel = ({ items }) => {
 	};
 	useEffect(() => {
 		updateDots();
-	});
+	}, []);
 	return (
 		<div className="carrusel">
-			<div className="body" ref={bodyRef}>
+			<div
+				className="body"
+				ref={bodyRef}
+				onScrollEnd={() => {
+					updateDots();
+				}}
+			>
 				{items.map(({ id, props, content }, index) => (
 					<article
 						key={id}
