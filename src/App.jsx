@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import Logo from "./components/Logo";
 import Navbar from "./components/Navbar";
 import RutaPrivada from "./components/RutaPrivada";
 import Escribir from "./pages/Escribir";
@@ -14,6 +16,11 @@ import Perfil from "./pages/Perfil";
 import Registro from "./pages/Registro";
 
 const App = () => {
+	const getDesktop = () => window.matchMedia("(min-width: 768px)").matches;
+	const [isDesktop, setIsDesktop] = useState(() => getDesktop());
+	window.addEventListener("resize", () => {
+		setIsDesktop(getDesktop());
+	});
 	return (
 		<>
 			<Navbar />
@@ -79,6 +86,7 @@ const App = () => {
 				{/* Cualquier otra dirección */}
 				<Route path="*" element={<NoEncontrada />} />
 			</Routes>
+			{!isDesktop ? <Logo /> : undefined}
 		</>
 	);
 };
