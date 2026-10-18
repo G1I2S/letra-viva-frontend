@@ -5,6 +5,7 @@
     "request": "launch",
     "type": "chrome",
     "url": "http://localhost:5173",
+    // Cambiar por el ejecutable de Chrome
     "runtimeExecutable": "/usr/bin/helium",
     "webRoot": "${GRAM_WORKTREE_ROOT}",
   }
