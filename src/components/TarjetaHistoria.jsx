@@ -13,7 +13,7 @@ const TarjetaHistoria = ({
 			<img src={portada_url} alt={`Portada para ${titulo}`} />
 			<div className="tarjeta-cuerpo">
 				{generos.map((genero) => (
-					<span key={id} className="etiqueta">
+					<span key={genero} className="etiqueta">
 						{genero}
 					</span>
 				))}
