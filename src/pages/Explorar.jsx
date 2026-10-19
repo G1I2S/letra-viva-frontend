@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Tabs from "../components/Tabs";
-import historias from "../data/historias";
 import TarjetaHistoria from "../components/TarjetaHistoria";
+import historias from "../data/historias";
 
 const Explorar = () => {
 	return (

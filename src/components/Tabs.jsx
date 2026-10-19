@@ -14,9 +14,11 @@ const Tabs = ({ items, dataset, datasetMap }) => {
 						key={id}
 						className={id === active ? "activa" : ""}
 						onClick={() => {
-              setActive(id);
-              setQuery(id)
-							setFilteredDataset(active === "_none" ? dataset : dataset.filter(filtro));
+							setActive(id);
+							setQuery({ tab: id });
+							setFilteredDataset(
+								active === "_none" ? dataset : dataset.filter(filtro),
+							);
 						}}
 					>
 						{titulo}
