@@ -1063,3 +1063,54 @@ fieldset.campo {
 [data-tema="claro"] .campo select:focus {
   border-color: var(--acento);
 }
+
+/* ===== Terminar Hito 2: Inicio, Explorar y arreglos ===== */
+
+/* En React el encabezado de Inicio va dentro de <main>, que ya tiene padding:
+   le quitamos el de los lados para que quede alineado con las secciones */
+main > .barra-inicio {
+  padding-left: 0;
+  padding-right: 0;
+  margin-bottom: 16px;
+}
+
+/* En JSX no hay espacio entre las etiquetas como en el HTML del prototipo */
+.tarjeta-cuerpo > .etiqueta + .etiqueta,
+.destacada-info > .etiqueta + .etiqueta {
+  margin-left: 4px;
+}
+
+/* El h2 de un mensaje fuera de una .seccion tomaba el tamaño grande de Bootstrap */
+.mensaje h2 {
+  font-size: 20px;
+}
+
+/* Arreglo: los botones con borde quedaban con texto oscuro (color de Bootstrap) */
+button.boton-borde {
+  color: var(--texto);
+}
+
+/* Arreglo: Bootstrap le pone padding a las listas <ol> y los capítulos quedaban corridos */
+.capitulos {
+  padding-left: 0;
+}
+
+/* Arreglo: en la ficha de historia los géneros usan .generos, que es la grilla
+   de botones de Inicio; aquí deben verse como etiquetas en una fila */
+.ficha-info .generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  overflow: visible;
+  margin-top: 8px;
+}
+
+/* Tema claro: estos textos van sobre fondos oscuros o de color, deben seguir siendo claros */
+[data-tema="claro"] .destacada-info,
+[data-tema="claro"] .genero {
+  color: #f2f2f2;
+}
+
+[data-tema="claro"] .destacada-info p {
+  color: #d0d0d0;
+}
