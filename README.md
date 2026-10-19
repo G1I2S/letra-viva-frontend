@@ -20,3 +20,4 @@ React, Vite, React Router, Context API, Axios y Bootstrap.
 - Gisela Astudillo
 - Sofía Maturana
 - Jorge Guzmán
+

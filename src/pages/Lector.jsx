@@ -163,7 +163,7 @@ const Lector = () => {
                 key={emocion.id}
                 type="button"
                 className="emocion"
-                style={{ color: '#f5f5f5' }}
+                style={{ color: 'var(--texto)' }}
                 aria-pressed={seleccionada}
                 onClick={() =>
                   setEmocionSeleccionada(
@@ -179,7 +179,7 @@ const Lector = () => {
                 key={emocion.id}
                 to="/login"
                 className="emocion"
-                style={{ color: '#f5f5f5' }}
+                style={{ color: 'var(--texto)' }}
               >
                 <span>{emocion.emoji}</span>
                 {emocion.nombre} · {emocion.total}
