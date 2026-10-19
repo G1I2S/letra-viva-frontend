@@ -5,7 +5,19 @@ import historias from "../data/historias";
 const Inicio = () => {
 	return (
 		<main>
-			<h1>Inicio</h1>
+      <header className="barra-superior barra-inicio">
+        <div className="eslogan">
+          <h1>Detrás de cada historia hay alguien que se atrevió a escribirla, y delante, alguien que la va a sentir.</h1>
+          <p>Letra Viva es el puente entre los dos.</p>
+        </div>
+        <Link to="/escribir" className="boton-escribir">
+          <i className="ti ti-pencil"></i>
+          <span>
+            <strong>Comparte tu historia</strong>
+            <small>Escribe lo que sientes. Alguien, en algún lugar, está esperando leerlo.</small>
+          </span>
+        </Link>
+      </header>
 			<Carrusel
 				items={historias.map(({ id, titulo, portada_url, generos }) => ({
 					id,
