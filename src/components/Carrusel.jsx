@@ -1,52 +1,34 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
+// Carrusel que se desliza hacia el lado.
+// items: [{ id, props, content }] -> props va al <article> y content es lo que se muestra dentro
 const Carrusel = ({ items }) => {
-	const itemsRef = useRef([]);
-	/** @type {import("react").RefObject<HTMLDivElement | null>} */
 	const bodyRef = useRef(null);
-	const [dots, setDots] = useState([]);
-	const updateDots = () => {
-		setDots(
-			itemsRef.current.map(({ id, ref }) => (
-				<span
-					key={id}
-					className={
-						Math.abs(
-							ref.getBoundingClientRect().left -
-								bodyRef.current.getBoundingClientRect().left,
-						) < 10
-							? "activo"
-							: ""
-					}
-				/>
-			)),
-		);
+	// Solo guardamos el número de la diapositiva visible; los puntos se calculan a partir de él
+	const [activo, setActivo] = useState(0);
+
+	// Al deslizar, calculamos qué diapositiva está a la vista:
+	// cuánto se ha deslizado dividido por el ancho de cada diapositiva
+	const actualizarActivo = () => {
+		const body = bodyRef.current;
+		const anchoDiapositiva = body.scrollWidth / items.length;
+		setActivo(Math.round(body.scrollLeft / anchoDiapositiva));
 	};
-	useEffect(() => {
-		updateDots();
-	}, []);
+
 	return (
 		<div className="carrusel">
-			<div
-				className="body"
-				ref={bodyRef}
-				onScrollEnd={() => {
-					updateDots();
-				}}
-			>
-				{items.map(({ id, props, content }, index) => (
-					<article
-						key={id}
-						{...props}
-						ref={(ref) => {
-							itemsRef.current[index] = { id, ref };
-						}}
-					>
+			<div className="body" ref={bodyRef} onScroll={actualizarActivo}>
+				{items.map(({ id, props, content }) => (
+					<article key={id} {...props}>
 						{content}
 					</article>
 				))}
 			</div>
-			<div className="puntos">{dots}</div>
+			<div className="puntos">
+				{items.map(({ id }, indice) => (
+					<span key={id} className={indice === activo ? "activo" : ""} />
+				))}
+			</div>
 		</div>
 	);
 };

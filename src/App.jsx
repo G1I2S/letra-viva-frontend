@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import Logo from "./components/Logo";
 import Navbar from "./components/Navbar";
@@ -18,9 +18,13 @@ import Registro from "./pages/Registro";
 const App = () => {
 	const getDesktop = () => window.matchMedia("(min-width: 768px)").matches;
 	const [isDesktop, setIsDesktop] = useState(() => getDesktop());
-	window.addEventListener("resize", () => {
-		setIsDesktop(getDesktop());
-	});
+	// Escuchamos el cambio de tamaño una sola vez y lo quitamos al desmontar
+	// (antes se agregaba un listener nuevo en cada render)
+	useEffect(() => {
+		const alCambiarTamano = () => setIsDesktop(getDesktop());
+		window.addEventListener("resize", alCambiarTamano);
+		return () => window.removeEventListener("resize", alCambiarTamano);
+	}, []);
 	return (
 		<>
 			<Navbar />

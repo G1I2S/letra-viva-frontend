@@ -1,29 +1,20 @@
-import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-
-const Tabs = ({ items, dataset, datasetMap }) => {
-	const [query, setQuery] = useSearchParams();
-	const [filteredDataset, setFilteredDataset] = useState(dataset);
-	const [active, setActive] = useState(Number(query.get("tab")) || items[0].id);
+// Pestañas reutilizables. No guardan estado propio: la página que las usa
+// decide cuál está activa y qué mostrar (así la lista se calcula en un solo lugar).
+// items: [{ id, titulo }], activa: id de la pestaña activa, onCambiar(id): se llama al hacer clic
+const Tabs = ({ items, activa, onCambiar }) => {
 	return (
-		<>
-			<div className="pestanas">
-				{items.map(({ id, titulo, filtro }) => (
-					<button
-						type="button"
-						key={id}
-						className={id === active ? "activa" : ""}
-						onClick={() => {
-							setActive(id);
-							setFilteredDataset(dataset.filter(filtro));
-						}}
-					>
-						{titulo}
-					</button>
-				))}
-			</div>
-			<div className="lista-historias">{filteredDataset.map(datasetMap)}</div>
-		</>
+		<div className="pestanas">
+			{items.map(({ id, titulo }) => (
+				<button
+					type="button"
+					key={id}
+					className={id === activa ? "activa" : ""}
+					onClick={() => onCambiar(id)}
+				>
+					{titulo}
+				</button>
+			))}
+		</div>
 	);
 };
 
