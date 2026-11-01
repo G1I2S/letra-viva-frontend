@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { mensajeError } from '../api';
 
 const Login = () => {
   const { login } = useContext(AuthContext);
@@ -9,17 +10,25 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [cargando, setCargando] = useState(false);
 
-  const enviar = (e) => {
+  const enviar = async (e) => {
     e.preventDefault();
     setError('');
     if (!email.trim() || !password) {
       setError('Ingresa tu correo y contraseña para continuar.');
       return;
     }
-    // El Context actual simula la autenticación y recibe el correo.
-    login(email.trim());
-    navigate(location.state?.from || '/perfil', { replace: true });
+    setCargando(true);
+    try {
+      await login(email.trim(), password);
+      navigate(location.state?.from || '/perfil', { replace: true });
+    } catch (err) {
+      // Muestra el mensaje del backend (ej. "Email o contraseña incorrectos")
+      setError(mensajeError(err));
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -36,7 +45,9 @@ const Login = () => {
           <span>Contraseña</span>
           <input type="password" name="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Tu contraseña" required />
         </label>
-        <button className="boton" type="submit">Iniciar sesión</button>
+        <button className="boton" type="submit" disabled={cargando}>
+          {cargando ? 'Entrando...' : 'Iniciar sesión'}
+        </button>
         <p className="aviso-registro">¿Todavía no tienes cuenta? <Link to="/registro">Crear cuenta</Link></p>
       </form>
     </main>
