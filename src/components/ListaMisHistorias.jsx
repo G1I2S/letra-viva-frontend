@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 
-// Lista las historias que el usuario publicó (guardadas en 'mis-historias').
-// No usamos TarjetaHistoria porque esa tarjeta es un Link a /historia/:id
-// y la página de historia todavía no conoce las historias guardadas localmente.
+// Lista las historias que el usuario publicó.
+// Recibe lo que entrega GET /usuarios/me: [{ id, titulo, portada_url, tipo }]
 const ListaMisHistorias = ({ historias }) => {
   if (historias.length === 0) {
     return (
@@ -18,26 +17,18 @@ const ListaMisHistorias = ({ historias }) => {
   return (
     <div className="lista-historias">
       {historias.map((historia) => (
-        <article className="tarjeta-historia" key={historia.id}>
+        // Cada tarjeta lleva a la ficha de la historia
+        <Link className="tarjeta-historia" to={`/historia/${historia.id}`} key={historia.id}>
           {historia.portada_url && (
             <img src={historia.portada_url} alt={`Portada para ${historia.titulo}`} />
           )}
           <div className="tarjeta-cuerpo">
             <div className="tarjeta-etiquetas">
               <span className="etiqueta">{historia.tipo === 'corto' ? 'Relato corto' : 'Novela'}</span>
-              {historia.generos.map((genero) => (
-                <span className="etiqueta" key={genero}>
-                  {genero}
-                </span>
-              ))}
             </div>
             <h3>{historia.titulo}</h3>
-            {historia.resumen && <p className="autor">{historia.resumen}</p>}
-            <p className="fecha">
-              {historia.capitulos.length} capítulo · Cap. 1: {historia.capitulos[0].titulo}
-            </p>
           </div>
-        </article>
+        </Link>
       ))}
     </div>
   );
