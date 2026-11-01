@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { mensajeError } from '../api';
 
 const Registro = () => {
   const { registro } = useContext(AuthContext);
@@ -10,8 +11,9 @@ const Registro = () => {
   const [password, setPassword] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
   const [error, setError] = useState('');
+  const [cargando, setCargando] = useState(false);
 
-  const enviar = (e) => {
+  const enviar = async (e) => {
     e.preventDefault();
     setError('');
     if (nombre.trim().length < 2) {
@@ -26,9 +28,17 @@ const Registro = () => {
       setError('Las contraseñas no coinciden.');
       return;
     }
-    // El Context actual simula el registro y recibe nombre y correo.
-    registro(nombre.trim(), email.trim());
-    navigate('/perfil', { replace: true });
+    setCargando(true);
+    try {
+      // Crea la cuenta y después inicia sesión automáticamente
+      await registro(nombre.trim(), email.trim(), password);
+      navigate('/perfil', { replace: true });
+    } catch (err) {
+      // Muestra el mensaje del backend (ej. "El correo ya está registrado")
+      setError(mensajeError(err));
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -53,7 +63,9 @@ const Registro = () => {
           <span>Repite tu contraseña</span>
           <input type="password" name="confirmacion" autoComplete="new-password" value={confirmacion} onChange={(e) => setConfirmacion(e.target.value)} minLength={8} placeholder="Confirma tu contraseña" required />
         </label>
-        <button className="boton" type="submit">Crear cuenta</button>
+        <button className="boton" type="submit" disabled={cargando}>
+          {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
+        </button>
         <p className="aviso-registro">¿Ya tienes cuenta? <Link to="/login">Iniciar sesión</Link></p>
       </form>
     </main>
