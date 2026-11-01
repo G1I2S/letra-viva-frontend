@@ -1,11 +1,10 @@
-import { useContext, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import ListaMisHistorias from '../components/ListaMisHistorias';
-import { AuthContext } from '../context/AuthContext';
-import { guardarLista, leerLista } from '../utils/almacenamiento';
+import api, { mensajeError } from '../api';
 
-const GENEROS = ['Fantasía', 'Misterio', 'Romance', 'Terror', 'Ciencia ficción', 'Drama', 'Aventura', 'Poesía'];
-
-// Valores iniciales del formulario (también se usan para limpiarlo)
+// Valores iniciales del formulario (también se usan para limpiarlo).
+// generos guarda los ids de los géneros elegidos
 const FORMULARIO_VACIO = {
   titulo: '',
   resumen: '',
@@ -17,11 +16,39 @@ const FORMULARIO_VACIO = {
 };
 
 const Escribir = () => {
-  const { usuario } = useContext(AuthContext);
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
   const [errores, setErrores] = useState({});
-  const [exito, setExito] = useState('');
-  const [misHistorias, setMisHistorias] = useState(() => leerLista('mis-historias'));
+  const [error, setError] = useState('');
+  const [publicando, setPublicando] = useState(false);
+  // Historia recién publicada, para el mensaje de éxito con su enlace
+  const [publicada, setPublicada] = useState(null);
+
+  // Datos que llegan del backend
+  const [generos, setGeneros] = useState([]);
+  const [misHistorias, setMisHistorias] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
+
+  // Pide mis historias a GET /usuarios/me (se usa al abrir y después de publicar)
+  const cargarMisHistorias = async () => {
+    const { data } = await api.get('/usuarios/me');
+    setMisHistorias(data.historias);
+  };
+
+  // Al abrir la página cargamos los géneros y mis historias al mismo tiempo
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const [respuestaGeneros] = await Promise.all([api.get('/generos'), cargarMisHistorias()]);
+        setGeneros(respuestaGeneros.data);
+      } catch (err) {
+        setErrorCarga(mensajeError(err));
+      } finally {
+        setCargando(false);
+      }
+    };
+    cargarDatos();
+  }, []);
 
   // Un solo manejador para todos los campos de texto:
   // usa el atributo name del input para saber qué propiedad cambiar
@@ -29,12 +56,12 @@ const Escribir = () => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
-  // Agrega o quita un género de la lista de seleccionados
-  const alternarGenero = (genero) => {
-    const generos = formulario.generos.includes(genero)
-      ? formulario.generos.filter((g) => g !== genero)
-      : [...formulario.generos, genero];
-    setFormulario({ ...formulario, generos });
+  // Agrega o quita el id de un género de la lista de seleccionados
+  const alternarGenero = (id) => {
+    const seleccionados = formulario.generos.includes(id)
+      ? formulario.generos.filter((g) => g !== id)
+      : [...formulario.generos, id];
+    setFormulario({ ...formulario, generos: seleccionados });
   };
 
   // Devuelve un objeto con los errores encontrados (vacío si todo está bien)
@@ -46,45 +73,65 @@ const Escribir = () => {
     return nuevosErrores;
   };
 
-  const publicar = (e) => {
+  const publicar = async (e) => {
     e.preventDefault();
-    setExito('');
+    setPublicada(null);
+    setError('');
 
     const nuevosErrores = validar();
     setErrores(nuevosErrores);
     if (Object.keys(nuevosErrores).length > 0) return;
 
-    // Misma forma que las historias de historias.js.
-    // En el Hito 3 esto se reemplaza por axios.post('/api/historias', ...)
-    const id = Date.now(); // id único simple mientras no haya backend
-    const historiaNueva = {
-      id,
-      titulo: formulario.titulo.trim(),
-      resumen: formulario.resumen.trim(),
-      portada_url: formulario.portada_url.trim() || null,
-      tipo: formulario.tipo,
-      autor: { id: usuario.id, nombre: usuario.nombre },
-      generos: formulario.generos,
-      total_reacciones: 0,
-      total_comentarios: 0,
-      capitulos: [
-        {
-          id: id + 1,
-          numero: 1,
+    setPublicando(true);
+    try {
+      // a) Creamos la historia
+      const { data: historia } = await api.post('/historias', {
+        titulo: formulario.titulo.trim(),
+        resumen: formulario.resumen.trim(),
+        portada_url: formulario.portada_url.trim() || null,
+        tipo: formulario.tipo,
+        generos: formulario.generos,
+      });
+
+      // b) Con el id que devolvió, creamos su primer capítulo
+      try {
+        await api.post(`/historias/${historia.id}/capitulos`, {
           titulo: formulario.capitulo_titulo.trim() || formulario.titulo.trim(),
           contenido: formulario.capitulo_contenido.trim(),
-        },
-      ],
-    };
+        });
+      } catch (errorCapitulo) {
+        // Si el capítulo falla, borramos la historia para que no quede vacía
+        await api.delete(`/historias/${historia.id}`).catch(() => {});
+        throw errorCapitulo;
+      }
 
-    // La más nueva queda primero
-    const actualizadas = [historiaNueva, ...misHistorias];
-    setMisHistorias(actualizadas);
-    guardarLista('mis-historias', actualizadas);
-
-    setExito(`¡"${historiaNueva.titulo}" fue publicada!`);
-    setFormulario(FORMULARIO_VACIO);
+      setPublicada({ id: historia.id, titulo: historia.titulo });
+      setFormulario(FORMULARIO_VACIO);
+      await cargarMisHistorias();
+    } catch (err) {
+      setError(mensajeError(err));
+    } finally {
+      setPublicando(false);
+    }
   };
+
+  if (cargando) {
+    return (
+      <main>
+        <p className="mensaje">Cargando...</p>
+      </main>
+    );
+  }
+
+  if (errorCarga) {
+    return (
+      <main>
+        <p className="mensaje" role="alert">
+          No pudimos preparar el formulario. {errorCarga}
+        </p>
+      </main>
+    );
+  }
 
   return (
     <main>
@@ -92,9 +139,15 @@ const Escribir = () => {
         <h1>Escribe tu historia</h1>
         <p className="formulario-sub">Publica una novela por capítulos o un relato corto.</p>
 
-        {exito && (
+        {publicada && (
           <p className="mensaje mensaje-exito" role="status">
-            {exito}
+            ¡"{publicada.titulo}" fue publicada! <Link to={`/historia/${publicada.id}`}>Ver mi historia</Link>
+          </p>
+        )}
+
+        {error && (
+          <p className="mensaje" role="alert">
+            {error}
           </p>
         )}
 
@@ -126,14 +179,14 @@ const Escribir = () => {
         <fieldset className="campo">
           <span>Géneros *</span>
           <div className="opciones-generos">
-            {GENEROS.map((genero) => (
-              <label key={genero} className={formulario.generos.includes(genero) ? 'opcion-genero activa' : 'opcion-genero'}>
+            {generos.map(({ id, nombre }) => (
+              <label key={id} className={formulario.generos.includes(id) ? 'opcion-genero activa' : 'opcion-genero'}>
                 <input
                   type="checkbox"
-                  checked={formulario.generos.includes(genero)}
-                  onChange={() => alternarGenero(genero)}
+                  checked={formulario.generos.includes(id)}
+                  onChange={() => alternarGenero(id)}
                 />
-                {genero}
+                {nombre}
               </label>
             ))}
           </div>
@@ -153,7 +206,9 @@ const Escribir = () => {
           {errores.contenido && <small className="error">{errores.contenido}</small>}
         </label>
 
-        <button className="boton" type="submit">Publicar historia</button>
+        <button className="boton" type="submit" disabled={publicando}>
+          {publicando ? 'Publicando...' : 'Publicar historia'}
+        </button>
       </form>
 
       <section className="seccion">

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ListaMisHistorias from '../components/ListaMisHistorias';
 import { AuthContext } from '../context/AuthContext';
-import { leerLista } from '../utils/almacenamiento';
+import api, { mensajeError } from '../api';
 
 // Lee el tema guardado ('oscuro' por defecto)
 const leerTema = () => {
@@ -14,10 +14,36 @@ const leerTema = () => {
 };
 
 const Perfil = () => {
-  const { usuario, logout } = useContext(AuthContext);
+  const { logout, actualizarUsuario } = useContext(AuthContext);
   const navigate = useNavigate();
   const [tema, setTema] = useState(leerTema);
-  const [misHistorias] = useState(() => leerLista('mis-historias'));
+
+  // Datos que llegan de GET /usuarios/me
+  const [perfil, setPerfil] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+
+  // Formulario para editar nombre y foto
+  const [formulario, setFormulario] = useState({ nombre: '', avatar_url: '' });
+  const [guardando, setGuardando] = useState(false);
+  const [mensajeFormulario, setMensajeFormulario] = useState('');
+  const [errorFormulario, setErrorFormulario] = useState('');
+
+  // Al abrir la página pedimos el perfil al backend
+  useEffect(() => {
+    const cargarPerfil = async () => {
+      try {
+        const { data } = await api.get('/usuarios/me');
+        setPerfil(data);
+        setFormulario({ nombre: data.nombre, avatar_url: data.avatar_url || '' });
+      } catch (err) {
+        setError(mensajeError(err));
+      } finally {
+        setCargando(false);
+      }
+    };
+    cargarPerfil();
+  }, []);
 
   // Cada vez que cambia el tema: lo ponemos en <html data-tema="..."> y lo guardamos
   useEffect(() => {
@@ -29,6 +55,38 @@ const Perfil = () => {
     }
   }, [tema]);
 
+  const cambiarCampo = (e) => {
+    setFormulario({ ...formulario, [e.target.name]: e.target.value });
+  };
+
+  const guardarPerfil = async (e) => {
+    e.preventDefault();
+    setMensajeFormulario('');
+    setErrorFormulario('');
+
+    if (!formulario.nombre.trim()) {
+      setErrorFormulario('El nombre es obligatorio.');
+      return;
+    }
+
+    setGuardando(true);
+    try {
+      const { data } = await api.put('/usuarios/me', {
+        nombre: formulario.nombre.trim(),
+        avatar_url: formulario.avatar_url.trim() || null,
+      });
+      // Si la respuesta no trae las historias, conservamos las que ya teníamos
+      setPerfil({ ...perfil, ...data });
+      // Actualiza el usuario en toda la app (por ejemplo, en el menú)
+      actualizarUsuario({ nombre: data.nombre, avatar_url: data.avatar_url });
+      setMensajeFormulario('¡Tus datos se guardaron!');
+    } catch (err) {
+      setErrorFormulario(mensajeError(err));
+    } finally {
+      setGuardando(false);
+    }
+  };
+
   const cerrarSesion = () => {
     logout();
     navigate('/');
@@ -36,20 +94,62 @@ const Perfil = () => {
 
   return (
     <main>
-      <section className="perfil">
-        {/* Si no hay foto, mostramos un círculo con la inicial del nombre */}
-        {usuario.avatar_url ? (
-          <img className="avatar" src={usuario.avatar_url} alt={`Foto de ${usuario.nombre}`} />
-        ) : (
-          <div className="avatar avatar-inicial" aria-hidden="true">
-            {usuario.nombre.charAt(0).toUpperCase()}
-          </div>
-        )}
-        <div>
-          <h1>{usuario.nombre}</h1>
-          <p className="autor">{usuario.email}</p>
-        </div>
-      </section>
+      {cargando && <p className="mensaje">Cargando...</p>}
+
+      {error && (
+        <p className="mensaje" role="alert">
+          No pudimos cargar tu perfil. {error}
+        </p>
+      )}
+
+      {perfil && (
+        <>
+          <section className="perfil">
+            {/* Si no hay foto, mostramos un círculo con la inicial del nombre */}
+            {perfil.avatar_url ? (
+              <img className="avatar" src={perfil.avatar_url} alt={`Foto de ${perfil.nombre}`} />
+            ) : (
+              <div className="avatar avatar-inicial" aria-hidden="true">
+                {perfil.nombre.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div>
+              <h1>{perfil.nombre}</h1>
+              <p className="autor">{perfil.email}</p>
+            </div>
+          </section>
+
+          <section className="seccion">
+            <h2>Editar perfil</h2>
+            <form className="formulario formulario-ancho" onSubmit={guardarPerfil} noValidate>
+              {mensajeFormulario && (
+                <p className="mensaje mensaje-exito" role="status">
+                  {mensajeFormulario}
+                </p>
+              )}
+              {errorFormulario && (
+                <p className="mensaje" role="alert">
+                  {errorFormulario}
+                </p>
+              )}
+
+              <label className="campo">
+                <span>Nombre</span>
+                <input name="nombre" value={formulario.nombre} onChange={cambiarCampo} placeholder="Tu nombre" />
+              </label>
+
+              <label className="campo">
+                <span>URL de la foto (opcional)</span>
+                <input type="url" name="avatar_url" value={formulario.avatar_url} onChange={cambiarCampo} placeholder="https://..." />
+              </label>
+
+              <button className="boton" type="submit" disabled={guardando}>
+                {guardando ? 'Guardando...' : 'Guardar cambios'}
+              </button>
+            </form>
+          </section>
+        </>
+      )}
 
       <section className="seccion">
         <h2>Tema</h2>
@@ -73,10 +173,12 @@ const Perfil = () => {
         </div>
       </section>
 
-      <section className="seccion">
-        <h2>Mis historias</h2>
-        <ListaMisHistorias historias={misHistorias} />
-      </section>
+      {perfil && (
+        <section className="seccion">
+          <h2>Mis historias</h2>
+          <ListaMisHistorias historias={perfil.historias} />
+        </section>
+      )}
 
       <button className="boton-borde" type="button" onClick={cerrarSesion}>
         Cerrar sesión

@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import notificaciones from '../data/notificaciones';
+import { useEffect, useState } from 'react';
+import api, { mensajeError } from '../api';
 
-// Emoji de cada emoción (los mismos ids que usa el Lector)
+// Emoji de cada emoción (los mismos ids que manda el backend)
 const EMOJIS = {
   llorar: '😢',
   sorpresa: '😮',
   risa: '😂',
   fuego: '🔥',
-  'corazon-roto': '💔',
+  corazon_roto: '💔',
 };
 
 // Ícono (Tabler Icons) según el tipo de notificación
@@ -29,7 +29,7 @@ const FILTROS = [
 const textoNotificacion = ({ tipo, usuario, historia, detalle }) => {
   if (tipo === 'donacion') {
     // toLocaleString('es-CL') agrega el punto de miles: 2000 -> 2.000
-    return `${usuario} donó $${detalle.toLocaleString('es-CL')} a ${historia}`;
+    return `${usuario} donó $${Number(detalle).toLocaleString('es-CL')} a ${historia}`;
   }
   if (tipo === 'comentario') {
     return `${usuario} comentó en ${historia}: "${detalle}"`;
@@ -49,6 +49,25 @@ const formatearFecha = (fecha) =>
 
 const Notificaciones = () => {
   const [filtro, setFiltro] = useState('todas');
+  // Lista que llega de GET /notificaciones
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+
+  // Al abrir la página pedimos las notificaciones al backend
+  useEffect(() => {
+    const cargarNotificaciones = async () => {
+      try {
+        const { data } = await api.get('/notificaciones');
+        setNotificaciones(data);
+      } catch (err) {
+        setError(mensajeError(err));
+      } finally {
+        setCargando(false);
+      }
+    };
+    cargarNotificaciones();
+  }, []);
 
   // Ordenamos de la más nueva a la más antigua.
   // Usamos [...notificaciones] para no modificar el arreglo original
@@ -56,6 +75,38 @@ const Notificaciones = () => {
 
   const visibles =
     filtro === 'todas' ? ordenadas : ordenadas.filter((notificacion) => notificacion.tipo === filtro);
+
+  // Decide qué mostrar debajo de las pestañas
+  const contenido = () => {
+    if (cargando) return <p className="mensaje">Cargando...</p>;
+    if (error) {
+      return (
+        <p className="mensaje" role="alert">
+          No pudimos cargar tus notificaciones. {error}
+        </p>
+      );
+    }
+    if (visibles.length === 0) {
+      return (
+        <section className="mensaje">
+          <p>No tienes notificaciones de este tipo.</p>
+        </section>
+      );
+    }
+    return (
+      <ul className="notificaciones">
+        {visibles.map((notificacion, indice) => (
+          <li className="notificacion" key={`${notificacion.fecha}-${indice}`}>
+            <i className={`ti ${ICONOS[notificacion.tipo]} notificacion-icono`} />
+            <div>
+              <p>{textoNotificacion(notificacion)}</p>
+              <p className="fecha">{formatearFecha(notificacion.fecha)}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    );
+  };
 
   return (
     <main>
@@ -74,23 +125,7 @@ const Notificaciones = () => {
         ))}
       </div>
 
-      {visibles.length === 0 ? (
-        <section className="mensaje">
-          <p>No tienes notificaciones de este tipo.</p>
-        </section>
-      ) : (
-        <ul className="notificaciones">
-          {visibles.map((notificacion, indice) => (
-            <li className="notificacion" key={`${notificacion.fecha}-${indice}`}>
-              <i className={`ti ${ICONOS[notificacion.tipo]} notificacion-icono`} />
-              <div>
-                <p>{textoNotificacion(notificacion)}</p>
-                <p className="fecha">{formatearFecha(notificacion.fecha)}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      {contenido()}
     </main>
   );
 };

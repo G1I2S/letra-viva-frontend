@@ -882,6 +882,18 @@ main {
   color: var(--texto);
 }
 
+/* Favoritos: "Seguir leyendo" y "Quitar" en una misma fila */
+.favorito-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.favorito-acciones .boton-secundario {
+  margin: 0;
+}
+
 /* Notificaciones */
 .notificaciones {
   list-style: none;
