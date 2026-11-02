@@ -1,136 +1,139 @@
-import { useContext, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import historias from '../data/historias';
+import { useContext, useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import api, { mensajeError } from "../api";
 
 const Historia = () => {
   const { id } = useParams();
   const { usuario } = useContext(AuthContext);
-  const historia = historias.find((item) => String(item.id) === id);
+  const [historia, setHistoria] = useState(null);
+  const [comentarios, setComentarios] = useState([]);
   const [favorita, setFavorita] = useState(false);
-  const [comentarioNuevo, setComentarioNuevo] = useState('');
-  const [comentariosLocales, setComentariosLocales] = useState([]);
+  const [comentarioNuevo, setComentarioNuevo] = useState("");
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!historia) return;
+    let activo = true;
+    setCargando(true);
+    setError("");
+    const peticiones = [
+      api.get(`/historias/${id}`),
+      api.get(`/historias/${id}/comentarios`),
+    ];
+    if (usuario) peticiones.push(api.get("/favoritos"));
+    Promise.all(peticiones)
+      .then(([ficha, listaComentarios, favoritos]) => {
+        if (!activo) return;
+        setHistoria(ficha.data);
+        setComentarios(
+          Array.isArray(listaComentarios.data) ? listaComentarios.data : [],
+        );
+        if (favoritos)
+          setFavorita(
+            favoritos.data.some(
+              (item) => String(item.historia?.id) === String(id),
+            ),
+          );
+        else setFavorita(Boolean(ficha.data.es_favorito));
+      })
+      .catch((err) => {
+        if (activo) setError(mensajeError(err));
+      })
+      .finally(() => {
+        if (activo) setCargando(false);
+      });
+    return () => {
+      activo = false;
+    };
+  }, [id, usuario]);
 
+  const alternarFavorito = async () => {
     try {
-      const favoritosGuardados = JSON.parse(
-        localStorage.getItem('historias-favoritas') || '[]',
-      );
-      setFavorita(favoritosGuardados.includes(historia.id));
-
-      const comentariosGuardados = JSON.parse(
-        localStorage.getItem(`comentarios-historia-${historia.id}`) || '[]',
-      );
-      setComentariosLocales(Array.isArray(comentariosGuardados) ? comentariosGuardados : []);
-    } catch {
-      setFavorita(false);
-      setComentariosLocales([]);
+      if (favorita) await api.delete(`/favoritos/${id}`);
+      else await api.post("/favoritos", { historia_id: Number(id) });
+      setFavorita(!favorita);
+    } catch (err) {
+      setError(mensajeError(err));
     }
-  }, [historia?.id]);
+  };
 
-  if (!historia) {
+  const agregarComentario = async (event) => {
+    event.preventDefault();
+    const contenido = comentarioNuevo.trim();
+    if (!contenido) return;
+    try {
+      const { data } = await api.post(`/historias/${id}/comentarios`, {
+        contenido,
+      });
+      setComentarios((actuales) => [data, ...actuales]);
+      setComentarioNuevo("");
+    } catch (err) {
+      setError(mensajeError(err));
+    }
+  };
+
+  if (cargando)
+    return (
+      <main>
+        <p className="mensaje">Cargando historia…</p>
+      </main>
+    );
+  if (!historia)
     return (
       <main>
         <Link className="volver" to="/explorar">
           ← Volver a explorar
         </Link>
         <section className="mensaje">
-          <h2>Historia no encontrada</h2>
-          <p>Puede que se haya movido o que el enlace no sea correcto.</p>
+          <h2>No pudimos cargar la historia</h2>
+          <p>
+            {error ||
+              "Puede que se haya movido o que el enlace no sea correcto."}
+          </p>
           <Link className="boton-secundario" to="/explorar">
             Explorar historias
           </Link>
         </section>
       </main>
     );
-  }
 
-  const primerCapitulo = historia.capitulos[0];
-  const comentariosPrototipo = [
-    {
-      autor: 'Sol M.',
-      fecha: 'hace 3 días',
-      texto: 'Ese final me dejó con la piel de gallina. Necesito saber qué había detrás de la puerta.',
-    },
-    {
-      autor: 'Tomás P.',
-      fecha: 'hace 1 semana',
-      texto: 'La atmósfera está increíble. Sentí que escuchaba la radio junto a Mara.',
-    },
-    {
-      autor: 'Valentina R.',
-      fecha: 'hace 2 semanas',
-      texto: 'Leí los tres capítulos de una sentada. ¡Por favor que salga el cuarto pronto!',
-    },
-  ];
-
-  const alternarFavorito = () => {
-    try {
-      const guardados = JSON.parse(
-        localStorage.getItem('historias-favoritas') || '[]',
-      );
-      const favoritosActualizados = favorita
-        ? guardados.filter((favoritoId) => favoritoId !== historia.id)
-        : [...guardados.filter((favoritoId) => favoritoId !== historia.id), historia.id];
-
-      localStorage.setItem(
-        'historias-favoritas',
-        JSON.stringify(favoritosActualizados),
-      );
-      setFavorita(!favorita);
-    } catch {
-      // Si el navegador bloquea localStorage, no cambia el estado guardado.
-    }
-  };
-
-  const agregarComentario = (event) => {
-    event.preventDefault();
-    const texto = comentarioNuevo.trim();
-    if (!texto || !usuario) return;
-
-    const comentario = {
-      autor: usuario.nombre || usuario.email || 'Usuario',
-      fecha: 'ahora',
-      texto,
-    };
-    const actualizados = [comentario, ...comentariosLocales];
-    setComentariosLocales(actualizados);
-    setComentarioNuevo('');
-
-    try {
-      localStorage.setItem(
-        `comentarios-historia-${historia.id}`,
-        JSON.stringify(actualizados),
-      );
-    } catch {
-      // El comentario permanece visible mientras la página siga abierta.
-    }
-  };
+  const primerCapitulo = historia.capitulos?.[0];
+  const capituloActual = historia.capitulo_actual;
+  const capituloParaSeguir = capituloActual
+    ? historia.capitulos?.find(
+        (cap) => Number(cap.numero) === Number(capituloActual),
+      )
+    : primerCapitulo;
+  const total = historia.totales || {};
+  const fecha = (valor) =>
+    valor ? new Date(valor).toLocaleDateString("es-CL") : "";
 
   return (
     <main>
       <Link className="volver" to="/explorar">
         ← Volver a explorar
       </Link>
-
+      {error && (
+        <p className="mensaje" role="alert">
+          {error}
+        </p>
+      )}
       <section className="ficha">
         <img
           className="ficha-portada"
           src={historia.portada_url}
           alt={`Portada de ${historia.titulo}`}
         />
-
         <div className="ficha-info">
           <span className="etiqueta">
-            {historia.tipo === 'corto' ? 'Relato corto' : 'Novela'}
+            {historia.tipo === "corto" ? "Relato corto" : "Novela"}
           </span>
           <h1>{historia.titulo}</h1>
           <p className="autor">
-            Por {historia.autor?.nombre || 'Autor desconocido'} · {historia.capitulos.length} capítulos
+            Por {historia.autor?.nombre || "Autor desconocido"} ·{" "}
+            {historia.capitulos?.length || 0} capítulos
           </p>
-
           <div className="generos">
             {historia.generos?.map((genero) => (
               <span className="etiqueta" key={genero}>
@@ -138,45 +141,48 @@ const Historia = () => {
               </span>
             ))}
           </div>
-
           <p className="ficha-resumen">{historia.resumen}</p>
-
           <div className="reacciones">
-            <span>♡ {historia.total_reacciones ?? 0} reacciones</span>
-            <span>💬 {(historia.total_comentarios ?? 0) + comentariosLocales.length} comentarios</span>
-            <span>📖 {historia.capitulos.length} capítulos</span>
+            <span>♡ {total.reacciones ?? 0} reacciones</span>
+            <span>
+              💬 {total.comentarios ?? comentarios.length} comentarios
+            </span>
+            <span>📖 {total.lecturas ?? 0} lecturas</span>
           </div>
-
           <div className="ficha-botones">
-            {primerCapitulo && (
+            {capituloParaSeguir && (
               <Link
                 className="boton"
-                to={`/historia/${historia.id}/capitulo/${primerCapitulo.numero}`}
+                to={`/historia/${historia.id}/capitulo/${capituloParaSeguir.numero}`}
               >
-                📖 Empezar a leer
+                📖{" "}
+                {capituloActual
+                  ? `Continuar leyendo · Cap. ${capituloActual}`
+                  : "Empezar a leer"}
               </Link>
             )}
-            <button
-              className="boton-borde"
-              type="button"
-              onClick={alternarFavorito}
-              aria-pressed={favorita}
-            >
-              {favorita ? '♥ Quitar de favoritos' : '♡ Agregar a favoritos'}
-            </button>
+            {usuario ? (
+              <button
+                className="boton-borde"
+                type="button"
+                onClick={alternarFavorito}
+                aria-pressed={favorita}
+              >
+                {favorita ? "♥ Quitar de favoritos" : "♡ Agregar a favoritos"}
+              </button>
+            ) : (
+              <Link className="boton-borde" to="/login">
+                ♡ Inicia sesión para guardar
+              </Link>
+            )}
           </div>
-          {!usuario && (
-            <p className="fecha">
-              <Link to="/login">Inicia sesión</Link> para sincronizar tus favoritos.
-            </p>
-          )}
         </div>
       </section>
 
       <section className="seccion" id="capitulos">
         <h2>Capítulos</h2>
         <ol className="capitulos">
-          {historia.capitulos.map((capitulo) => (
+          {historia.capitulos?.map((capitulo) => (
             <li key={capitulo.id}>
               <Link to={`/historia/${historia.id}/capitulo/${capitulo.numero}`}>
                 <span>
@@ -188,12 +194,8 @@ const Historia = () => {
           ))}
         </ol>
       </section>
-
       <section className="seccion" id="comentarios">
-        <h2>
-          Comentarios ({(historia.total_comentarios ?? 0) + comentariosLocales.length})
-        </h2>
-
+        <h2>Comentarios ({comentarios.length})</h2>
         {usuario ? (
           <form className="formulario-comentario" onSubmit={agregarComentario}>
             <label className="campo">
@@ -216,16 +218,16 @@ const Historia = () => {
             💬 Inicia sesión para dejar tu comentario
           </Link>
         )}
-
-        {[...comentariosLocales, ...comentariosPrototipo].map((comentario, indice) => (
-          <article className="comentario" key={`${comentario.autor}-${comentario.fecha}-${indice}`}>
+        {comentarios.map((comentario) => (
+          <article className="comentario" key={comentario.id}>
             <p className="comentario-autor">
-              {comentario.autor}{' '}
-              <span className="fecha">· {comentario.fecha}</span>
+              {comentario.usuario?.nombre || "Lector"}{" "}
+              <span className="fecha">· {fecha(comentario.fecha)}</span>
             </p>
-            <p>{comentario.texto}</p>
+            <p>{comentario.contenido}</p>
           </article>
         ))}
+        {!comentarios.length && <p>Aún no hay comentarios.</p>}
       </section>
     </main>
   );
