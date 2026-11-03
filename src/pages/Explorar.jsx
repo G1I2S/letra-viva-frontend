@@ -15,12 +15,18 @@ const Explorar = () => {
   const [generos, setGeneros] = useState([]);
   const [generosElegidos, setGenerosElegidos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
+  const [busquedaAplicada, setBusquedaAplicada] = useState("");
   const [pestana, setPestana] = useState("todas");
   const [historias, setHistorias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [pagina, setPagina] = useState(1);
   const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const temporizador = setTimeout(() => setBusquedaAplicada(busqueda), 400);
+    return () => clearTimeout(temporizador);
+  }, [busqueda]);
 
   useEffect(() => {
     let activo = true;
@@ -52,7 +58,7 @@ const Explorar = () => {
     const params = { pagina, limite: 12 };
     if (pestana !== "todas") params.tipo = pestana;
     if (generosElegidos.length) params.generos = generosElegidos.join(",");
-    if (busqueda.trim()) params.buscar = busqueda.trim();
+    if (busquedaAplicada.trim()) params.buscar = busquedaAplicada.trim();
     api
       .get("/historias", { params })
       .then(({ data }) => {
@@ -69,7 +75,7 @@ const Explorar = () => {
     return () => {
       activo = false;
     };
-  }, [busqueda, pestana, generosElegidos, pagina]);
+  }, [busquedaAplicada, pestana, generosElegidos, pagina]);
 
   const alternarGenero = (id) => {
     setPagina(1);
@@ -171,7 +177,7 @@ const Explorar = () => {
               ← Anterior
             </button>
             <span>
-              Página {pagina} · {total} historias
+              Página {pagina} · {total} {total === 1 ? "historia" : "historias"}
             </span>
             <button
               className="boton-borde"
@@ -188,4 +194,6 @@ const Explorar = () => {
 };
 
 export default Explorar;
+
+
 
