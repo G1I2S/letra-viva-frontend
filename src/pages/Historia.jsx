@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import api, { mensajeError } from "../api";
@@ -12,6 +12,8 @@ const Historia = () => {
   const [comentarioNuevo, setComentarioNuevo] = useState("");
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+  const [enviandoComentario, setEnviandoComentario] = useState(false);
+  const comentarioEnCurso = useRef(false);
 
   useEffect(() => {
     let activo = true;
@@ -61,7 +63,9 @@ const Historia = () => {
   const agregarComentario = async (event) => {
     event.preventDefault();
     const contenido = comentarioNuevo.trim();
-    if (!contenido) return;
+    if (!contenido || comentarioEnCurso.current) return;
+    comentarioEnCurso.current = true;
+    setEnviandoComentario(true);
     try {
       const { data } = await api.post(`/historias/${id}/comentarios`, {
         contenido,
@@ -70,6 +74,9 @@ const Historia = () => {
       setComentarioNuevo("");
     } catch (err) {
       setError(mensajeError(err));
+    } finally {
+      comentarioEnCurso.current = false;
+      setEnviandoComentario(false);
     }
   };
 
@@ -122,7 +129,7 @@ const Historia = () => {
       <section className="ficha">
         <img
           className="ficha-portada"
-          src={historia.portada_url}
+          src={historia.portada_url || "/portada-respaldo.svg"}
           alt={`Portada de ${historia.titulo}`}
         />
         <div className="ficha-info">
@@ -214,8 +221,12 @@ const Historia = () => {
                 required
               />
             </label>
-            <button className="boton" type="submit">
-              Publicar comentario
+            <button
+              className="boton"
+              type="submit"
+              disabled={enviandoComentario}
+            >
+              {enviandoComentario ? "Enviando…" : "Publicar comentario"}
             </button>
           </form>
         ) : (
@@ -239,5 +250,6 @@ const Historia = () => {
 };
 
 export default Historia;
+
 
 
