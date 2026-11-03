@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import api, { mensajeError } from "../api";
 import Carrusel from "../components/Carrusel";
 import TarjetaHistoria from "../components/TarjetaHistoria";
+import generosConEstilo from "../data/generos";
 
 const haceCuanto = (fecha) => {
   if (!fecha) return "";
@@ -27,7 +28,7 @@ const Inicio = () => {
         params: { orden: "populares", pagina: 1, limite: 5 },
       }),
       api.get("/historias", {
-        params: { orden: "recientes", dias: 30, pagina: 1, limite: 10 },
+        params: { orden: "recientes", pagina: 1, limite: 10 },
       }),
       api.get("/historias", { params: { pagina: 1, limite: 12 } }),
       api.get("/generos"),
@@ -108,15 +109,25 @@ const Inicio = () => {
       <section className="seccion">
         <h2>Géneros</h2>
         <div className="generos">
-          {generos.map((g) => (
-            <Link
-              key={g.id}
-              to={`/explorar?genero=${encodeURIComponent(g.nombre)}`}
-              className="genero"
-            >
-              {g.nombre}
-            </Link>
-          ))}
+          {generos.map((g) => {
+            const estilo = generosConEstilo.find(
+              (item) =>
+                item.nombre.toLocaleLowerCase("es") ===
+                g.nombre.toLocaleLowerCase("es"),
+            );
+            const emoji = estilo?.emoji || "";
+            const color = estilo?.color || "#6b4f4f";
+            return (
+              <Link
+                key={g.id}
+                to={`/explorar?genero=${encodeURIComponent(g.nombre)}`}
+                className="genero"
+                style={{ "--color": color }}
+              >
+                {emoji} {g.nombre}
+              </Link>
+            );
+          })}
         </div>
       </section>
       <section className="seccion">
@@ -176,3 +187,4 @@ const Inicio = () => {
 };
 
 export default Inicio;
+
