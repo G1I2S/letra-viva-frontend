@@ -86,7 +86,10 @@ const Inicio = () => {
               props: { className: "destacada" },
               content: (
                 <Link to={`/historia/${h.id}`}>
-                  <img src={h.portada_url} alt={`Portada de ${h.titulo}`} />
+                  <img
+                    src={h.portada_url || "/portada-respaldo.svg"}
+                    alt={`Portada de ${h.titulo}`}
+                  />
                   <div className="destacada-info">
                     <span className="etiqueta">
                       {h.generos?.[0] || "Historia"}
@@ -135,7 +138,10 @@ const Inicio = () => {
         <div className="fila">
           {recientes.map((h) => (
             <Link key={h.id} to={`/historia/${h.id}`} className="tarjeta-mini">
-              <img src={h.portada_url} alt={`Portada de ${h.titulo}`} />
+              <img
+                src={h.portada_url || "/portada-respaldo.svg"}
+                alt={`Portada de ${h.titulo}`}
+              />
               <h3>{h.titulo}</h3>
               <p>
                 {h.tipo === "corto"
