@@ -177,7 +177,7 @@ const Explorar = () => {
               ← Anterior
             </button>
             <span>
-              Página {pagina} · {total} historias
+              Página {pagina} · {total} {total === 1 ? "historia" : "historias"}
             </span>
             <button
               className="boton-borde"
@@ -194,5 +194,6 @@ const Explorar = () => {
 };
 
 export default Explorar;
+
 
 
