@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Cormorant+Garamond:ital,wght@1,500&display=swap");
 @import url("https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css");
+
 :root {
   --fondo: #121212;
   --superficie: #1e1e1e;
@@ -28,7 +29,8 @@ body {
 #root {
   display: flex;
   flex-direction: column-reverse;
-  height: 100dvh; /* Altura fija al tamaño de la vista*/
+  height: 100dvh;
+  /* Altura fija al tamaño de la vista*/
 }
 
 a {
@@ -172,6 +174,21 @@ main {
   line-height: 1;
 }
 
+.aviso-notificacion-nueva {
+  position: fixed;
+  z-index: 1000;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: var(--acento);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .menu a i.lupa {
   color: var(--texto);
 }
@@ -180,6 +197,7 @@ main {
   color: var(--acento);
   font-weight: bold;
 }
+
 /* Secciones del inicio */
 .seccion {
   margin-bottom: 32px;
@@ -203,6 +221,7 @@ main {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
+
 .carrusel > .body::-webkit-scrollbar {
   display: none;
 }
@@ -266,6 +285,7 @@ main {
 .puntos span.activo {
   background: var(--acento);
 }
+
 /* Fila que se desliza hacia el lado */
 .fila {
   display: flex;
@@ -277,12 +297,14 @@ main {
 .fila::-webkit-scrollbar {
   display: none;
 }
+
 .tarjeta-mini {
   flex: 0 0 160px;
   background: var(--superficie);
   padding: 10px;
   border-radius: 12px;
 }
+
 .tarjeta-mini img {
   display: block;
   width: 100%;
@@ -311,6 +333,7 @@ main {
   padding: 8px 18px;
   border-radius: 20px;
 }
+
 /* Géneros: dos filas que se deslizan */
 .generos {
   display: grid;
@@ -333,6 +356,7 @@ main {
   text-align: center;
   font-weight: bold;
 }
+
 /* Mensaje */
 .mensaje {
   background: var(--superficie);
@@ -386,6 +410,7 @@ main {
   margin-top: 10px;
   font-size: 14px;
 }
+
 /* Aviso de página privada */
 .aviso-privado {
   max-width: 420px;
@@ -422,10 +447,12 @@ main {
 .aviso-registro a {
   color: var(--acento);
 }
+
 /* Eslogan */
 .eslogan {
   margin-bottom: 24px;
 }
+
 .eslogan h1 {
   font-family: "Cormorant Garamond", serif;
   font-style: italic;
@@ -505,6 +532,7 @@ main {
   color: var(--texto);
   border-bottom: 2px solid var(--acento);
 }
+
 /* Ficha de la historia */
 .volver {
   display: inline-block;
@@ -593,6 +621,7 @@ main {
   font-weight: bold;
   margin-bottom: 4px;
 }
+
 /* Lector */
 .lector {
   max-width: 680px;
@@ -742,6 +771,7 @@ main {
   font-size: 12px;
   color: var(--texto-suave);
 }
+
 /* Formularios (login y registro) */
 .formulario {
   max-width: 400px;
@@ -799,10 +829,12 @@ main {
 .formulario .aviso-registro {
   text-align: center;
 }
+
 @media (min-width: 768px) {
   #root {
     flex-direction: row;
   }
+
   .menu {
     width: 240px;
     height: 100%;
@@ -865,15 +897,19 @@ main {
     overflow-y: auto;
     padding-left: 1rem;
   }
+
   .destacada img {
     height: 320px;
   }
+
   .tarjeta-mini {
     flex-basis: 180px;
   }
+
   .lista-historias {
     grid-template-columns: repeat(3, 1fr);
   }
+
   .ficha {
     flex-direction: row;
     align-items: flex-start;
