@@ -132,7 +132,8 @@ const Historia = () => {
           <h1>{historia.titulo}</h1>
           <p className="autor">
             Por {historia.autor?.nombre || "Autor desconocido"} ·{" "}
-            {historia.capitulos?.length || 0} capítulos
+            {historia.capitulos?.length || 0}{" "}
+            {(historia.capitulos?.length || 0) === 1 ? "capítulo" : "capítulos"}
           </p>
           <div className="generos">
             {historia.generos?.map((genero) => (
@@ -179,21 +180,25 @@ const Historia = () => {
         </div>
       </section>
 
-      <section className="seccion" id="capitulos">
-        <h2>Capítulos</h2>
-        <ol className="capitulos">
-          {historia.capitulos?.map((capitulo) => (
-            <li key={capitulo.id}>
-              <Link to={`/historia/${historia.id}/capitulo/${capitulo.numero}`}>
-                <span>
-                  Capítulo {capitulo.numero} · {capitulo.titulo}
-                </span>
-                <span aria-hidden="true">→</span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {historia.tipo === "novela" && (
+        <section className="seccion" id="capitulos">
+          <h2>Capítulos</h2>
+          <ol className="capitulos">
+            {historia.capitulos?.map((capitulo) => (
+              <li key={capitulo.id}>
+                <Link
+                  to={`/historia/${historia.id}/capitulo/${capitulo.numero}`}
+                >
+                  <span>
+                    Capítulo {capitulo.numero} · {capitulo.titulo}
+                  </span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
       <section className="seccion" id="comentarios">
         <h2>Comentarios ({comentarios.length})</h2>
         {usuario ? (
@@ -234,4 +239,5 @@ const Historia = () => {
 };
 
 export default Historia;
+
 
