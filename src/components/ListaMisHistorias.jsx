@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 // Lista las historias que el usuario publicó.
 // Recibe lo que entrega GET /usuarios/me: [{ id, titulo, portada_url, tipo }]
@@ -18,13 +18,20 @@ const ListaMisHistorias = ({ historias }) => {
     <div className="lista-historias">
       {historias.map((historia) => (
         // Cada tarjeta lleva a la ficha de la historia
-        <Link className="tarjeta-historia" to={`/historia/${historia.id}`} key={historia.id}>
-          {historia.portada_url && (
-            <img src={historia.portada_url} alt={`Portada para ${historia.titulo}`} />
-          )}
+        <Link
+          className="tarjeta-historia"
+          to={`/historia/${historia.id}`}
+          key={historia.id}
+        >
+          <img
+            src={historia.portada_url || "/portada-respaldo.svg"}
+            alt={`Portada para ${historia.titulo}`}
+          />
           <div className="tarjeta-cuerpo">
             <div className="tarjeta-etiquetas">
-              <span className="etiqueta">{historia.tipo === 'corto' ? 'Relato corto' : 'Novela'}</span>
+              <span className="etiqueta">
+                {historia.tipo === "corto" ? "Relato corto" : "Novela"}
+              </span>
             </div>
             <h3>{historia.titulo}</h3>
           </div>
@@ -35,3 +42,4 @@ const ListaMisHistorias = ({ historias }) => {
 };
 
 export default ListaMisHistorias;
+
