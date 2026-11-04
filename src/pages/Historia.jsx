@@ -1,11 +1,12 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import api, { mensajeError } from "../api";
 
 const Historia = () => {
   const { id } = useParams();
   const { usuario } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [historia, setHistoria] = useState(null);
   const [comentarios, setComentarios] = useState([]);
   const [favorita, setFavorita] = useState(false);
@@ -14,6 +15,11 @@ const Historia = () => {
   const [error, setError] = useState("");
   const [enviandoComentario, setEnviandoComentario] = useState(false);
   const comentarioEnCurso = useRef(false);
+  const [eliminandoHistoria, setEliminandoHistoria] = useState(false);
+  // Ids de los comentarios que se están eliminando
+  const [eliminandoComentarios, setEliminandoComentarios] = useState([]);
+  // El error se muestra junto al comentario: { id, mensaje }
+  const [errorComentario, setErrorComentario] = useState(null);
 
   useEffect(() => {
     let activo = true;
@@ -60,6 +66,58 @@ const Historia = () => {
     }
   };
 
+  const eliminarHistoria = async () => {
+    const confirmado = window.confirm(
+      "¿Seguro que quieres eliminar esta historia? También se borrarán sus capítulos, comentarios y reacciones. No se puede deshacer.",
+    );
+    if (!confirmado) return;
+    setError("");
+    setEliminandoHistoria(true);
+    try {
+      await api.delete(`/historias/${id}`);
+      navigate("/perfil");
+    } catch (err) {
+      setError(mensajeError(err));
+    } finally {
+      setEliminandoHistoria(false);
+    }
+  };
+
+  // Si el backend no mandó el total, el contador ya usa comentarios.length
+  const cambiarTotalComentarios = (cambio) => {
+    setHistoria((actual) =>
+      actual.totales?.comentarios == null
+        ? actual
+        : {
+            ...actual,
+            totales: {
+              ...actual.totales,
+              comentarios: Number(actual.totales.comentarios) + cambio,
+            },
+          },
+    );
+  };
+
+  const eliminarComentario = async (comentarioId) => {
+    if (!window.confirm("¿Eliminar este comentario? No se puede deshacer."))
+      return;
+    setErrorComentario(null);
+    setEliminandoComentarios((actuales) => [...actuales, comentarioId]);
+    try {
+      await api.delete(`/comentarios/${comentarioId}`);
+      setComentarios((actuales) =>
+        actuales.filter((comentario) => comentario.id !== comentarioId),
+      );
+      cambiarTotalComentarios(-1);
+    } catch (err) {
+      setErrorComentario({ id: comentarioId, mensaje: mensajeError(err) });
+    } finally {
+      setEliminandoComentarios((actuales) =>
+        actuales.filter((actual) => actual !== comentarioId),
+      );
+    }
+  };
+
   const agregarComentario = async (event) => {
     event.preventDefault();
     const contenido = comentarioNuevo.trim();
@@ -71,6 +129,7 @@ const Historia = () => {
         contenido,
       });
       setComentarios((actuales) => [data, ...actuales]);
+      cambiarTotalComentarios(1);
       setComentarioNuevo("");
     } catch (err) {
       setError(mensajeError(err));
@@ -113,6 +172,11 @@ const Historia = () => {
       )
     : primerCapitulo;
   const total = historia.totales || {};
+  const esAutor =
+    Boolean(usuario) && String(usuario?.id) === String(historia.autor?.id);
+  const puedeEliminarComentario = (comentario) =>
+    Boolean(usuario) &&
+    (String(comentario.usuario?.id) === String(usuario?.id) || esAutor);
   const fecha = (valor) =>
     valor ? new Date(valor).toLocaleDateString("es-CL") : "";
 
@@ -183,6 +247,16 @@ const Historia = () => {
                 ♡ Inicia sesión para guardar
               </Link>
             )}
+            {esAutor && (
+              <button
+                className="boton-borde"
+                type="button"
+                onClick={eliminarHistoria}
+                disabled={eliminandoHistoria}
+              >
+                {eliminandoHistoria ? "Eliminando…" : "Eliminar historia"}
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -241,6 +315,23 @@ const Historia = () => {
               <span className="fecha">· {fecha(comentario.fecha)}</span>
             </p>
             <p>{comentario.contenido}</p>
+            {puedeEliminarComentario(comentario) && (
+              <button
+                className="boton-borde"
+                type="button"
+                onClick={() => eliminarComentario(comentario.id)}
+                disabled={eliminandoComentarios.includes(comentario.id)}
+              >
+                {eliminandoComentarios.includes(comentario.id)
+                  ? "Eliminando…"
+                  : "Eliminar"}
+              </button>
+            )}
+            {errorComentario?.id === comentario.id && (
+              <small className="error" role="alert">
+                {errorComentario.mensaje}
+              </small>
+            )}
           </article>
         ))}
         {!comentarios.length && <p>Aún no hay comentarios.</p>}

@@ -87,6 +87,14 @@ const Perfil = () => {
     }
   };
 
+  // Saca la historia eliminada de la lista, sin recargar la página
+  const quitarHistoria = (id) => {
+    setPerfil((actual) => ({
+      ...actual,
+      historias: actual.historias.filter((historia) => historia.id !== id),
+    }));
+  };
+
   const cerrarSesion = () => {
     logout();
     navigate('/');
@@ -176,7 +184,7 @@ const Perfil = () => {
       {perfil && (
         <section className="seccion">
           <h2>Mis historias</h2>
-          <ListaMisHistorias historias={perfil.historias} />
+          <ListaMisHistorias historias={perfil.historias} onEliminada={quitarHistoria} />
         </section>
       )}
 
