@@ -78,3 +78,4 @@ const ListaMisHistorias = ({ historias, onEliminada }) => {
 };
 
 export default ListaMisHistorias;
+
