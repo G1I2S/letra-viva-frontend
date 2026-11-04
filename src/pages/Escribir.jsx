@@ -115,6 +115,13 @@ const Escribir = () => {
     }
   };
 
+  // Saca la historia eliminada de la lista, sin recargar la página.
+  // Si era la recién publicada, también quita el mensaje con su enlace
+  const quitarHistoria = (id) => {
+    setMisHistorias((actuales) => actuales.filter((historia) => historia.id !== id));
+    setPublicada((actual) => (actual?.id === id ? null : actual));
+  };
+
   if (cargando) {
     return (
       <main>
@@ -213,7 +220,7 @@ const Escribir = () => {
 
       <section className="seccion">
         <h2>Mis historias</h2>
-        <ListaMisHistorias historias={misHistorias} />
+        <ListaMisHistorias historias={misHistorias} onEliminada={quitarHistoria} />
       </section>
     </main>
   );
