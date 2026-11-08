@@ -4,6 +4,9 @@ import ListaMisHistorias from '../components/ListaMisHistorias';
 import { AuthContext } from '../context/AuthContext';
 import api, { mensajeError } from '../api';
 
+// Los 10 avatares que están en public/avatares/
+const AVATARES = Array.from({ length: 10 }, (_, i) => `/avatares/avatar-${i + 1}.svg`);
+
 // Lee el tema guardado ('oscuro' por defecto)
 const leerTema = () => {
   try {
@@ -146,9 +149,37 @@ const Perfil = () => {
                 <input name="nombre" value={formulario.nombre} onChange={cambiarCampo} placeholder="Tu nombre" />
               </label>
 
+              <fieldset className="campo">
+                <legend className="leyenda-avatares">Elige tu avatar</legend>
+                <div className="grilla-avatares">
+                  {AVATARES.map((ruta, i) => {
+                    const elegido = formulario.avatar_url === ruta;
+                    return (
+                      <button
+                        key={ruta}
+                        type="button"
+                        className={elegido ? 'opcion-avatar elegido' : 'opcion-avatar'}
+                        onClick={() => setFormulario({ ...formulario, avatar_url: ruta })}
+                        aria-pressed={elegido}
+                      >
+                        <img src={ruta} alt={`Avatar ${i + 1}`} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+
+              {/* Si avatar_url es uno de los 10 avatares, el campo queda vacío;
+                  si es otro link, aparece aquí y ningún avatar queda marcado */}
               <label className="campo">
-                <span>URL de la foto (opcional)</span>
-                <input type="url" name="avatar_url" value={formulario.avatar_url} onChange={cambiarCampo} placeholder="https://..." />
+                <span>O pega el link de tu foto (opcional)</span>
+                <input
+                  type="url"
+                  name="avatar_url"
+                  value={AVATARES.includes(formulario.avatar_url) ? '' : formulario.avatar_url}
+                  onChange={cambiarCampo}
+                  placeholder="https://..."
+                />
               </label>
 
               <button className="boton" type="submit" disabled={guardando}>

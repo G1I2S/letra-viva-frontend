@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Avatar gato">
+  <circle cx="128" cy="128" r="128" fill="#4A3B5C"/>
+  <circle cx="128" cy="128" r="114" fill="none" stroke="#F5EFE7" stroke-opacity="0.22" stroke-width="2"/>
+    <path d="M106 86 L110 60 L124 76 L132 76 L146 60 L150 86 C156 104 146 118 128 118 C110 118 100 104 106 86 Z" fill="#F5EFE7" fill-opacity="0.14"/>
+    <path d="M106 86 L110 60 L124 76 L132 76 L146 60 L150 86 C156 104 146 118 128 118 C110 118 100 104 106 86 Z" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M112 116 C94 140 94 176 106 198 L150 198 C162 176 162 140 144 116" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M154 194 C182 198 190 174 176 160" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M116 94 C118 91 122 91 124 94 M132 94 C134 91 138 91 140 94" fill="none" stroke="#F5EFE7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.75"/>
+</svg>

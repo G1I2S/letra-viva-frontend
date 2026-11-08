@@ -1210,3 +1210,94 @@ button.boton-borde {
 [data-tema="claro"] .destacada-info p {
   color: #d0d0d0;
 }
+
+/* ===== Avatares del perfil ===== */
+.leyenda-avatares {
+  font-size: 14px;
+  color: var(--texto-suave);
+  margin-bottom: 8px;
+}
+
+.grilla-avatares {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 420px;
+}
+
+.opcion-avatar {
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.opcion-avatar img {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.opcion-avatar:hover {
+  transform: scale(1.05);
+}
+
+.opcion-avatar:focus-visible {
+  outline: 2px solid var(--texto);
+  outline-offset: 2px;
+}
+
+.opcion-avatar.elegido {
+  border-color: var(--acento);
+}
+
+/* ===== Filtro de géneros en Explorar: píldoras ===== */
+.filtro-opciones {
+  min-width: 200px;
+}
+
+.pildora-genero {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--texto);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.pildora-genero:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pildora-genero:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
+/* Igual que el ítem activo del menú lateral */
+.pildora-genero.elegido {
+  background: rgba(224, 112, 63, 0.15);
+  color: var(--acento);
+  border-color: var(--acento);
+  font-weight: bold;
+}
+
+.pildora-genero.elegido:hover {
+  background: rgba(224, 112, 63, 0.25);
+}
+
+[data-tema="claro"] .pildora-genero:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+[data-tema="claro"] .pildora-genero.elegido:hover {
+  background: rgba(224, 112, 63, 0.25);
+}

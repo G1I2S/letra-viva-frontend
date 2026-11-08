@@ -112,16 +112,20 @@ const Explorar = () => {
             {generosElegidos.length > 0 && ` (${generosElegidos.length})`} ▾
           </summary>
           <div className="filtro-opciones">
-            {generos.map((g) => (
-              <label key={g.id}>
-                <input
-                  type="checkbox"
-                  checked={generosElegidos.includes(g.id)}
-                  onChange={() => alternarGenero(g.id)}
-                />{" "}
-                {g.nombre}
-              </label>
-            ))}
+            {generos.map((g) => {
+              const elegido = generosElegidos.includes(g.id);
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  className={elegido ? "pildora-genero elegido" : "pildora-genero"}
+                  aria-pressed={elegido}
+                  onClick={() => alternarGenero(g.id)}
+                >
+                  {g.nombre}
+                </button>
+              );
+            })}
           </div>
         </details>
       </div>

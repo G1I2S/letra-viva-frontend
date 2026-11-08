@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Avatar pluma">
+  <circle cx="128" cy="128" r="128" fill="#E0703F"/>
+  <circle cx="128" cy="128" r="114" fill="none" stroke="#F5EFE7" stroke-opacity="0.22" stroke-width="2"/>
+    <g transform="rotate(35 128 128)">
+      <path d="M128 44 C168 66 172 132 140 186 L128 192 L116 186 C84 132 88 66 128 44 Z" fill="#F5EFE7" fill-opacity="0.14"/>
+      <path d="M128 44 C168 66 172 132 140 186 L128 192 L116 186 C84 132 88 66 128 44 Z" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M128 82 L154 70 M128 102 L160 90 M128 122 L161 110 M128 142 L157 130 M128 162 L150 151 M128 82 L102 70 M128 102 L96 90 M128 122 L95 110 M128 142 L99 130 M128 162 L106 151" fill="none" stroke="#F5EFE7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.75"/>
+      <path d="M128 56 L128 226" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+</svg>
