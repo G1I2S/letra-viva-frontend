@@ -174,6 +174,7 @@ const Explorar = () => {
           </div>
           <nav className="navegacion-cap" aria-label="Paginación">
             <button
+              type="button"
               className="boton-borde"
               disabled={pagina <= 1}
               onClick={() => setPagina((p) => p - 1)}
@@ -184,6 +185,7 @@ const Explorar = () => {
               Página {pagina} · {total} {total === 1 ? "historia" : "historias"}
             </span>
             <button
+              type="button"
               className="boton-borde"
               disabled={pagina * 12 >= total}
               onClick={() => setPagina((p) => p + 1)}
