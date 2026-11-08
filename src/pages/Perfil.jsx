@@ -38,7 +38,7 @@ const Perfil = () => {
       try {
         const { data } = await api.get('/usuarios/me');
         setPerfil(data);
-        setFormulario({ nombre: data.nombre, avatar_url: data.avatar_url || '' });
+        setFormulario({ nombre: data.nombre, avatar_url: data.avatar_url || AVATARES[0] });
       } catch (err) {
         setError(mensajeError(err));
       } finally {
@@ -76,7 +76,7 @@ const Perfil = () => {
     try {
       const { data } = await api.put('/usuarios/me', {
         nombre: formulario.nombre.trim(),
-        avatar_url: formulario.avatar_url.trim() || null,
+        avatar_url: formulario.avatar_url.trim() || AVATARES[0],
       });
       // Si la respuesta no trae las historias, conservamos las que ya teníamos
       setPerfil({ ...perfil, ...data });
@@ -116,14 +116,7 @@ const Perfil = () => {
       {perfil && (
         <>
           <section className="perfil">
-            {/* Si no hay foto, mostramos un círculo con la inicial del nombre */}
-            {perfil.avatar_url ? (
-              <img className="avatar" src={perfil.avatar_url} alt={`Foto de ${perfil.nombre}`} />
-            ) : (
-              <div className="avatar avatar-inicial" aria-hidden="true">
-                {perfil.nombre.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <img className="avatar" src={perfil.avatar_url || AVATARES[0]} alt={`Foto de ${perfil.nombre}`} />
             <div>
               <h1>{perfil.nombre}</h1>
               <p className="autor">{perfil.email}</p>
