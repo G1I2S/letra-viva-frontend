@@ -55,10 +55,7 @@ const Inicio = () => {
     <main>
       <header className="barra-superior barra-inicio">
         <div className="eslogan">
-          <h1>
-            Detrás de cada historia hay alguien que se atrevió a escribirla, y
-            delante, alguien que la va a sentir.
-          </h1>
+          <h1>Escrita con valor, leída con el corazón.</h1>
           <p>Letra Viva es el puente entre los dos.</p>
         </div>
         <Link to="/escribir" className="boton-escribir">
