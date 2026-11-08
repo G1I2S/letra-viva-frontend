@@ -54,19 +54,22 @@ const Notificaciones = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
 
-  // Al abrir la página pedimos las notificaciones al backend
+  // Refrescamos mientras la página sigue abierta para mostrar novedades al instante.
   useEffect(() => {
+    let activa = true;
     const cargarNotificaciones = async () => {
       try {
         const { data } = await api.get('/notificaciones');
-        setNotificaciones(data);
+        if (activa) setNotificaciones(data);
       } catch (err) {
-        setError(mensajeError(err));
+        if (activa) setError(mensajeError(err));
       } finally {
-        setCargando(false);
+        if (activa) setCargando(false);
       }
     };
     cargarNotificaciones();
+    const intervalo = window.setInterval(cargarNotificaciones, 5000);
+    return () => { activa = false; window.clearInterval(intervalo); };
   }, []);
 
   // Ordenamos de la más nueva a la más antigua.
