@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import api, { mensajeError } from "../api";
 import Carrusel from "../components/Carrusel";
@@ -20,6 +20,12 @@ const Inicio = () => {
   const [generos, setGeneros] = useState([]);
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
+  const recientesRef = useRef(null);
+
+  const moverRecientes = (direccion) => {
+    const fila = recientesRef.current;
+    if (fila) fila.scrollBy({ left: direccion * Math.max(fila.clientWidth * 0.8, 220), behavior: "smooth" });
+  };
 
   useEffect(() => {
     let activo = true;
@@ -132,7 +138,9 @@ const Inicio = () => {
       </section>
       <section className="seccion">
         <h2>Recientes</h2>
-        <div className="fila">
+        <div className="carrusel-fila">
+          <button className="carrusel-flecha anterior" type="button" onClick={() => moverRecientes(-1)} aria-label="Historias recientes anteriores"><i className="ti ti-chevron-left" /></button>
+          <div className="fila" ref={recientesRef}>
           {recientes.map((h) => (
             <Link key={h.id} to={`/historia/${h.id}`} className="tarjeta-mini">
               <img
@@ -148,6 +156,8 @@ const Inicio = () => {
               </p>
             </Link>
           ))}
+          </div>
+          <button className="carrusel-flecha siguiente" type="button" onClick={() => moverRecientes(1)} aria-label="Historias recientes siguientes"><i className="ti ti-chevron-right" /></button>
         </div>
         <Link to="/explorar" className="boton-secundario">
           Descubrir más

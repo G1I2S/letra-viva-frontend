@@ -343,6 +343,13 @@ main {
   color: var(--acento);
   padding: 8px 18px;
   border-radius: 20px;
+  transition: background-color 0.18s, color 0.18s, transform 0.18s;
+}
+
+.boton-secundario:hover {
+  background: var(--acento);
+  color: #fff;
+  transform: translateY(-2px);
 }
 
 /* Géneros: dos filas que se deslizan */
@@ -386,9 +393,44 @@ main {
 /* Mensaje */
 .mensaje {
   background: var(--superficie);
-  border-left: 4px solid var(--acento);
   border-radius: 12px;
   padding: 16px;
+}
+
+.carrusel-fila {
+  position: relative;
+}
+
+.carrusel-flecha {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(18, 18, 18, 0.88);
+  color: var(--texto);
+  cursor: pointer;
+}
+
+.carrusel-flecha:hover { background: var(--acento); }
+.carrusel-flecha:disabled { opacity: 0.35; cursor: default; }
+.carrusel-flecha.anterior { left: 4px; }
+.carrusel-flecha.siguiente { right: 4px; }
+
+.campo-con-visibilidad { position: relative; }
+.campo-con-visibilidad input { padding-right: 48px; }
+.alternar-visibilidad {
+  position: absolute;
+  top: 32px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  color: var(--texto-suave);
+  cursor: pointer;
 }
 
 .mensaje p {

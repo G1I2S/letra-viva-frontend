@@ -10,6 +10,8 @@ const Registro = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
@@ -55,13 +57,15 @@ const Registro = () => {
           <span>Correo electrónico</span>
           <input type="email" name="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" required />
         </label>
-        <label className="campo">
+        <label className="campo campo-con-visibilidad">
           <span>Contraseña</span>
-          <input type="password" name="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} placeholder="Mínimo 8 caracteres" required />
+          <input type={mostrarPassword ? 'text' : 'password'} name="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} placeholder="Mínimo 8 caracteres" required />
+          <button className="alternar-visibilidad" type="button" onClick={() => setMostrarPassword((visible) => !visible)} aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-pressed={mostrarPassword}><i className={`ti ti-eye${mostrarPassword ? '-off' : ''}`} /></button>
         </label>
-        <label className="campo">
+        <label className="campo campo-con-visibilidad">
           <span>Repite tu contraseña</span>
-          <input type="password" name="confirmacion" autoComplete="new-password" value={confirmacion} onChange={(e) => setConfirmacion(e.target.value)} minLength={8} placeholder="Confirma tu contraseña" required />
+          <input type={mostrarConfirmacion ? 'text' : 'password'} name="confirmacion" autoComplete="new-password" value={confirmacion} onChange={(e) => setConfirmacion(e.target.value)} minLength={8} placeholder="Confirma tu contraseña" required />
+          <button className="alternar-visibilidad" type="button" onClick={() => setMostrarConfirmacion((visible) => !visible)} aria-label={mostrarConfirmacion ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-pressed={mostrarConfirmacion}><i className={`ti ti-eye${mostrarConfirmacion ? '-off' : ''}`} /></button>
         </label>
         <button className="boton" type="submit" disabled={cargando}>
           {cargando ? 'Creando cuenta...' : 'Crear cuenta'}
