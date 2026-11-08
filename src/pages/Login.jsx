@@ -9,6 +9,7 @@ const Login = () => {
   const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
@@ -41,9 +42,10 @@ const Login = () => {
           <span>Correo electrónico</span>
           <input type="email" name="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" required />
         </label>
-        <label className="campo">
+        <label className="campo campo-con-visibilidad">
           <span>Contraseña</span>
-          <input type="password" name="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Tu contraseña" required />
+          <input type={mostrarPassword ? 'text' : 'password'} name="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Tu contraseña" required />
+          <button className="alternar-visibilidad" type="button" onClick={() => setMostrarPassword((visible) => !visible)} aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'} aria-pressed={mostrarPassword}><i className={`ti ti-eye${mostrarPassword ? '-off' : ''}`} /></button>
         </label>
         <button className="boton" type="submit" disabled={cargando}>
           {cargando ? 'Entrando...' : 'Iniciar sesión'}
