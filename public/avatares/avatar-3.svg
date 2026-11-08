@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Avatar luna">
+  <circle cx="128" cy="128" r="128" fill="#2B3A67"/>
+  <circle cx="128" cy="128" r="114" fill="none" stroke="#F5EFE7" stroke-opacity="0.22" stroke-width="2"/>
+    <path d="M150 70 A60 60 0 1 0 150 186 A48 48 0 0 1 150 70 Z" fill="#F5EFE7" fill-opacity="0.14"/>
+    <path d="M150 70 A60 60 0 1 0 150 186 A48 48 0 0 1 150 70 Z" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M176 82 L179 92 L189 95 L179 98 L176 108 L173 98 L163 95 L173 92 Z" fill="#F5EFE7"/>
+    <path d="M190 140 L192 146 L198 148 L192 150 L190 156 L188 150 L182 148 L188 146 Z" fill="#F5EFE7"/>
+    <circle cx="164" cy="174" r="3" fill="#F5EFE7"/>
+</svg>

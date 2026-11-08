@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Avatar carta">
+  <circle cx="128" cy="128" r="128" fill="#8E3B46"/>
+  <circle cx="128" cy="128" r="114" fill="none" stroke="#F5EFE7" stroke-opacity="0.22" stroke-width="2"/>
+    <rect x="60" y="88" width="136" height="90" rx="8" fill="#F5EFE7" fill-opacity="0.12"/>
+    <rect x="60" y="88" width="136" height="90" rx="8" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M62 92 L128 140 L194 92" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M64 174 L110 132 M192 174 L146 132" fill="none" stroke="#F5EFE7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.75"/>
+    <circle cx="128" cy="142" r="16" fill="#F5EFE7"/>
+    <path d="M128 133 L130.5 139 L137 139.5 L132 143.5 L133.5 150 L128 146.5 L122.5 150 L124 143.5 L119 139.5 L125.5 139 Z" fill="#8E3B46"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Avatar rosa">
+  <circle cx="128" cy="128" r="128" fill="#A64B5E"/>
+  <circle cx="128" cy="128" r="114" fill="none" stroke="#F5EFE7" stroke-opacity="0.22" stroke-width="2"/>
+    <path d="M100 100 C88 120 100 152 128 154 C156 152 168 120 156 100 C146 90 110 90 100 100 Z" fill="#F5EFE7" fill-opacity="0.14"/>
+    <path d="M100 100 C88 120 100 152 128 154 C156 152 168 120 156 100" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M108 104 C102 124 112 142 128 144 C144 142 154 124 148 104" fill="none" stroke="#F5EFE7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.75"/>
+    <path d="M128 106 C140 98 152 108 146 120 C140 132 118 130 114 118 C110 104 124 92 140 94" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M128 154 C126 172 130 188 128 206" fill="none" stroke="#F5EFE7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M128 178 C112 168 98 172 92 184 C106 190 120 188 128 178 Z" fill="#F5EFE7" fill-opacity="0.85"/>
+    <path d="M129 192 C142 182 156 184 162 194 C150 200 138 200 129 192 Z" fill="#F5EFE7" fill-opacity="0.85"/>
+</svg>
